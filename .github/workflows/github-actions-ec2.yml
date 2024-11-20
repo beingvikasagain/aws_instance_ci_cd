@@ -44,26 +44,14 @@ jobs:
         chmod 600 ssh_key
 
         # Connect to EC2 and deploy
-        ssh -o StrictHostKeyChecking=no -i ssh_key $EC2_USER@$EC2_HOST << 'EOF'
-          # Navigate to the project directory
-          cd /path/to/your/project
-
-          # Pull latest changes from the repository
-          git pull origin main
-
-          # Activate virtual environment
-          source venv/bin/activate
-
-          # Install dependencies
-          pip install -r requirements.txt
-
-          # Run database migrations
-          python manage.py migrate
-
-          # Collect static files
-          python manage.py collectstatic --noinput
-
-          # Restart the server (Gunicorn/uwsgi and Nginx)
-          sudo systemctl restart gunicorn
-          sudo systemctl restart nginx
+        ssh -T -o StrictHostKeyChecking=no -i ssh_key $EC2_USER@$EC2_HOST << 'EOF'
+        echo "Connected successfully"
+        cd /path/to/your/project
+        git pull origin main
+        source venv/bin/activate
+        pip install -r requirements.txt
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+        sudo systemctl restart gunicorn
+        sudo systemctl restart nginx
         EOF
