@@ -36,16 +36,17 @@ jobs:
     - name: Deploy to EC2
       env:
         EC2_USER: ubuntu                     # Change to your EC2 username (e.g., ec2-user, ubuntu)
-        EC2_HOST: ${{secrets.HOST_DNS}}    # Public IP/Domain of your EC2 instance, stored as a GitHub secret
-        EC2_KEY: ${{secrets.EC2_SSH_KEY}}  # SSH private key, stored as a GitHub secret
+        EC2_HOST: ${{ secrets.HOST_DNS }}    # Public IP/Domain of your EC2 instance, stored as a GitHub secret
+        EC2_KEY: ${{ secrets.EC2_SSH_KEY }}  # SSH private key, stored as a GitHub secret
       run: |
         # Add the private key for SSH
-        echo "$EC2_KEY" > ssh_key
-        chmod 600 ssh_key
+        mkdir -p ~/.ssh  # Create the .ssh directory if it doesn't exist
+        echo "$EC2_KEY" > ~/.ssh/ssh_key
+        chmod 600 ~/.ssh/ssh_key
 
         # Connect to EC2 and deploy
-        ssh-keyscan -H $EC2_HOST >> ~/home/
-        ssh -T -i ssh_key $EC2_USER@$EC2_HOST << EOF
+        ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+        ssh -T -i ~/.ssh/ssh_key $EC2_USER@$EC2_HOST << EOF
         echo "Connected successfully"
         cd /home/
         git pull origin main
