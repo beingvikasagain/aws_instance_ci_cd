@@ -40,11 +40,12 @@ jobs:
         EC2_KEY: ${{secrets.EC2_SSH_KEY}}  # SSH private key, stored as a GitHub secret
       run: |
         # Add the private key for SSH
-        echo "${EC2_KEY}" > ssh_key
+        echo "$EC2_KEY" > ssh_key
         chmod 600 ssh_key
 
         # Connect to EC2 and deploy
-        ssh -T -o StrictHostKeyChecking=no -i ssh_key $EC2_USER@$EC2_HOST << 'EOF'
+        ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+        ssh -T -i ssh_key $EC2_USER@$EC2_HOST << EOF
         echo "Connected successfully"
         cd /home/
         git pull origin main
